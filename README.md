@@ -1,6 +1,6 @@
 # Projects Review Status
 
-A multi-project file development tracker built with **Next.js 14**, **TypeScript**, **Prisma**, and **Neon Postgres**.
+A multi-project file development tracker built with **Next.js 15**, **TypeScript**, **Prisma**, and **Neon Postgres**.
 
 Track `Tested`, `Cleaned`, and `Reviewed` status for every file across all your projects.
 
@@ -8,9 +8,9 @@ Track `Tested`, `Cleaned`, and `Reviewed` status for every file across all your 
 
 ## Tech Stack
 
-- **Next.js 14** (App Router, Server Components)
+- **Next.js 15** (App Router, Server Components)
 - **TypeScript**
-- **Prisma ORM** (standard Node.js client)
+- **Prisma ORM** (standard Node.js client — auto-generated on install & build)
 - **Neon Postgres** (serverless PostgreSQL — connect via standard `postgresql://` URL)
 
 ---
@@ -22,6 +22,7 @@ Track `Tested`, `Cleaned`, and `Reviewed` status for every file across all your 
 ```bash
 cd projects-review-status
 npm install
+# prisma generate runs automatically via postinstall
 ```
 
 ### 2. Set up Neon Postgres
@@ -53,19 +54,15 @@ npm run db:push
 
 This creates the `Project` and `File` tables in your Neon database.
 
-### 5. Generate Prisma Client
-
-```bash
-npm run db:generate
-```
-
-### 6. Run the development server
+### 5. Run the development server
 
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+> **Note:** You do not need to run `prisma generate` manually — it runs automatically after `npm install` and before `npm run build`.
 
 ---
 
@@ -100,7 +97,7 @@ src/
 │   ├── ProjectsHomeClient.tsx
 │   └── StatBadge.tsx
 ├── lib/
-│   └── db.ts                             # Prisma + Neon singleton
+│   └── db.ts                             # Prisma singleton
 └── types/
     └── index.ts
 prisma/
@@ -114,10 +111,10 @@ prisma/
 | Command | Description |
 |---|---|
 | `npm run dev` | Start development server |
-| `npm run build` | Build for production |
+| `npm run build` | Generate Prisma client + build for production |
 | `npm run start` | Start production server |
 | `npm run db:push` | Push schema to Neon (no migrations) |
-| `npm run db:generate` | Regenerate Prisma Client |
+| `npm run db:generate` | Manually regenerate Prisma Client |
 | `npm run db:studio` | Open Prisma Studio (visual DB browser) |
 
 ---
@@ -127,6 +124,4 @@ prisma/
 1. Push this repo to GitHub.
 2. Import into [Vercel](https://vercel.com).
 3. Add `DATABASE_URL` as an environment variable in your Vercel project settings.
-4. Deploy — Vercel will run `next build` automatically.
-
-> **Note:** Neon's serverless driver works natively with Vercel Edge and Node.js runtimes.
+4. Deploy — Vercel runs `npm install` (triggers `postinstall` → `prisma generate`) then `npm run build` automatically.

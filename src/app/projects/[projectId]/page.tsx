@@ -6,12 +6,13 @@ import ProjectDetailClient from "@/components/ProjectDetailClient";
 export const dynamic = "force-dynamic";
 
 interface Props {
-  params: { projectId: string };
+  params: Promise<{ projectId: string }>;
 }
 
 export async function generateMetadata({ params }: Props) {
+  const { projectId } = await params;
   const project = await db.project.findUnique({
-    where: { id: params.projectId },
+    where: { id: projectId },
   });
   return {
     title: project ? `${project.name} — Projects Review Status` : "Project Not Found",
@@ -19,8 +20,9 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function ProjectPage({ params }: Props) {
+  const { projectId } = await params;
   const project = await db.project.findUnique({
-    where: { id: params.projectId },
+    where: { id: projectId },
     include: { files: { orderBy: { createdAt: "asc" } } },
   });
 

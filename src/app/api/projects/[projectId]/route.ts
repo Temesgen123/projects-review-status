@@ -5,11 +5,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET(
   _request: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
+    const { projectId } = await params;
     const project = await db.project.findUnique({
-      where: { id: params.projectId },
+      where: { id: projectId },
       include: { files: { orderBy: { createdAt: "asc" } } },
     });
 
@@ -26,14 +27,15 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
+    const { projectId } = await params;
     const body = await request.json();
     const { name, description } = body;
 
     const project = await db.project.update({
-      where: { id: params.projectId },
+      where: { id: projectId },
       data: {
         ...(name !== undefined && { name: name.trim() }),
         ...(description !== undefined && { description: description?.trim() || null }),
@@ -50,10 +52,11 @@ export async function PATCH(
 
 export async function DELETE(
   _request: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    await db.project.delete({ where: { id: params.projectId } });
+    const { projectId } = await params;
+    await db.project.delete({ where: { id: projectId } });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE /api/projects/[projectId] error:", error);

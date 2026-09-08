@@ -5,14 +5,15 @@ export const dynamic = "force-dynamic";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
+    const { fileId } = await params;
     const body = await request.json();
     const { tested, cleaned, reviewed, notes } = body;
 
     const file = await db.file.update({
-      where: { id: params.fileId },
+      where: { id: fileId },
       data: {
         ...(tested !== undefined && { tested }),
         ...(cleaned !== undefined && { cleaned }),
@@ -30,10 +31,11 @@ export async function PATCH(
 
 export async function DELETE(
   _request: Request,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-    await db.file.delete({ where: { id: params.fileId } });
+    const { fileId } = await params;
+    await db.file.delete({ where: { id: fileId } });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE /api/files/[fileId] error:", error);

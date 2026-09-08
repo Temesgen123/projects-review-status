@@ -5,9 +5,10 @@ export const dynamic = "force-dynamic";
 
 export async function POST(
   request: Request,
-  { params }: { params: { projectId: string } }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
+    const { projectId } = await params;
     const body = await request.json();
     const { path } = body;
 
@@ -18,7 +19,7 @@ export async function POST(
     const file = await db.file.create({
       data: {
         path: path.trim(),
-        projectId: params.projectId,
+        projectId,
       },
     });
 
